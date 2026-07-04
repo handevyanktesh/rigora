@@ -1,0 +1,24 @@
+// server.js
+const express = require("express");
+const cors = require("cors");
+require("dotenv").config();
+const connectDB = require("./config/db");
+connectDB();
+
+const app = express();
+
+// Middleware: allows Express to understand JSON sent in requests
+app.use(express.json());
+
+// Middleware: allows requests from React (different port)
+app.use(cors());
+
+// Test route
+app.get("/api/test", (req, res) => {
+  res.json({ message: "Backend is working!" });
+});
+
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
