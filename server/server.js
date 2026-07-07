@@ -13,6 +13,9 @@ app.use(express.json());
 // Middleware: allows requests from React (different port)
 app.use(cors());
 
+const authRoutes = require("./routes/authRoutes");
+app.use("/api/auth", authRoutes);
+
 // Test route
 app.get("/api/test", (req, res) => {
   res.json({ message: "Backend is working!" });
