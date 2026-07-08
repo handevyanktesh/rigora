@@ -4,10 +4,54 @@ const Product = require("../models/Product");
 // Public - list all products (with optional category filter)
 const getProducts = async (req, res) => {
   try {
-    const { category } = req.query;
-    const filter = category ? { category } : {};
-    const products = await Product.find(filter);
-    res.status(200).json(products);
+    const {
+      search,
+      category,
+      brand,
+      minPrice,
+      maxPrice,
+      page = 1,
+      limit = 20,
+    } = req.query;
+ 
+    // Build filter object dynamically
+    const filter = {};
+
+    if (search) {
+      filter.name = { $regex: search, $options: "i" }; // case-insensitive partial match
+    }
+
+    if (category) {
+      filter.category = category;
+    }
+
+    if (brand) {
+      filter.brand = { $regex: brand, $options: "i" };
+    }
+
+    if (minPrice || maxPrice) {
+      filter.price = {};
+      if (minPrice) filter.price.$gte = Number(minPrice);
+      if (maxPrice) filter.price.$lte = Number(maxPrice);
+    }
+
+    // Pagination math
+    const pageNum = Number(page);
+    const limitNum = Number(limit);
+    const skip = (pageNum - 1) * limitNum;
+
+    // Run both queries: the page of results, and the total count for that filter
+    const [products, totalCount] = await Promise.all([
+      Product.find(filter).skip(skip).limit(limitNum),
+      Product.countDocuments(filter),
+    ]);
+
+    res.status(200).json({
+      products,
+      page: pageNum,
+      totalPages: Math.ceil(totalCount / limitNum),
+      totalCount,
+    });
   } catch (error) {
     res.status(500).json({ message: "Server error", error: error.message });
   }
@@ -26,7 +70,7 @@ const getProductById = async (req, res) => {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
-
+ 
 // @route  POST /api/products
 // Admin only - create product
 const createProduct = async (req, res) => {
