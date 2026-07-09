@@ -19,6 +19,9 @@ app.use("/api/auth", authRoutes);
 const productRoutes = require("./routes/productRoutes");
 app.use("/api/products", productRoutes);
 
+const compatibilityRoutes = require("./routes/compatibilityRoutes");
+app.use("/api/compatibility", compatibilityRoutes);
+
 // Test route
 app.get("/api/test", (req, res) => {
   res.json({ message: "Backend is working!" });
