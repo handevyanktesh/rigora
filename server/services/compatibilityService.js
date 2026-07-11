@@ -50,4 +50,40 @@ const checkRamMotherboard = (ram, motherboard) => {
   };
 };
 
-module.exports = { checkCpuMotherboard, checkRamMotherboard };
+const checkPsuWattage = (cpu, gpu, psu) => {
+  const cpuDraw = Number(cpu.specs.get("powerDraw"));
+  const gpuDraw = Number(gpu.specs.get("powerDraw"));
+  const psuWattage = Number(psu.specs.get("wattage"));
+
+  if (!cpuDraw || !gpuDraw || !psuWattage) {
+    return {
+      compatible: false,
+      reason: "Power draw or wattage information missing for one or more components",
+    };
+  }
+
+  const totalDraw = cpuDraw + gpuDraw;
+  const recommendedWattage = Math.ceil(totalDraw * 1.2); // 20% safety margin
+
+  if (psuWattage >= recommendedWattage) {
+    return {
+      compatible: true,
+      reason: `PSU (${psuWattage}W) comfortably covers total draw (${totalDraw}W) with safety margin`,
+    };
+  }
+
+  if (psuWattage >= totalDraw) {
+    return {
+      compatible: true,
+      warning: true,
+      reason: `PSU (${psuWattage}W) covers total draw (${totalDraw}W) but has little headroom — recommended at least ${recommendedWattage}W`,
+    };
+  }
+
+  return {
+    compatible: false,
+    reason: `PSU (${psuWattage}W) is insufficient for total draw (${totalDraw}W)`,
+  };
+};
+
+module.exports = { checkCpuMotherboard, checkRamMotherboard, checkPsuWattage };
