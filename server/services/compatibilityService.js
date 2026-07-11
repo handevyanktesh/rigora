@@ -24,4 +24,30 @@ const checkCpuMotherboard = (cpu, motherboard) => {
   };
 };
 
-module.exports = { checkCpuMotherboard };
+
+// NEW
+const checkRamMotherboard = (ram, motherboard) => {
+  const ramType = ram.specs.get("type");
+  const supportedType = motherboard.specs.get("ramType");
+
+  if (!ramType || !supportedType) {
+    return {
+      compatible: false,
+      reason: "RAM type information missing for RAM or Motherboard",
+    };
+  }
+
+  if (ramType === supportedType) {
+    return {
+      compatible: true,
+      reason: `RAM type (${ramType}) matches Motherboard's supported RAM type (${supportedType})`,
+    };
+  }
+
+  return {
+    compatible: false,
+    reason: `RAM type mismatch: RAM is ${ramType}, Motherboard supports ${supportedType}`,
+  };
+};
+
+module.exports = { checkCpuMotherboard, checkRamMotherboard };
