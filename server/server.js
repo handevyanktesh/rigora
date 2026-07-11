@@ -31,6 +31,9 @@ app.use("/api/wishlist", wishlistRoutes);
 const buildRoutes = require("./routes/buildRoutes");
 app.use("/api/builds", buildRoutes);
 
+const aiRoutes = require("./routes/aiRoutes");
+app.use("/api/ai", aiRoutes);
+
 // Test route
 app.get("/api/test", (req, res) => {
   res.json({ message: "Backend is working!" });
