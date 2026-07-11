@@ -22,6 +22,9 @@ app.use("/api/products", productRoutes);
 const compatibilityRoutes = require("./routes/compatibilityRoutes");
 app.use("/api/compatibility", compatibilityRoutes);
 
+const cartRoutes = require("./routes/cartRoutes");
+app.use("/api/cart", cartRoutes);
+
 // Test route
 app.get("/api/test", (req, res) => {
   res.json({ message: "Backend is working!" });
